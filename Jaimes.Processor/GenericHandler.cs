@@ -25,20 +25,29 @@ namespace Jaimes.Processor
 
         public void ReadQueue(IModel channel)
         {
-            Message myMessage = _queue.Receive();
+            Message message = _queue.Receive();
 
-            Console.WriteLine($"Mensagem {myMessage.Id} recebida.");
+            Console.WriteLine($"Mensagem {message.Id} recebida.");
 
-            var stringContent = JsonConvert.SerializeObject(myMessage.Body);
+            try
+            {
+                var stringContent = JsonConvert.SerializeObject(message.Body);
 
-            var body = Encoding.UTF8.GetBytes(stringContent);
+                var body = Encoding.UTF8.GetBytes(stringContent);
 
-            channel.BasicPublish(exchange: _destinyExchange,
-                                 routingKey: _routingKey,
-                                 basicProperties: null,
-                                 body: body);
+                channel.BasicPublish(exchange: _destinyExchange,
+                                     routingKey: _routingKey,
+                                     basicProperties: null,
+                                     body: body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Não foi possível disparar a mensagem {message.Id}. Erro: {ex}");
 
-            Console.WriteLine($"Mensagem {myMessage.Id} enviada para {_destinyExchange}.");
+                _queue.Send(message);
+            }
+
+            Console.WriteLine($"Mensagem {message.Id} enviada para {_destinyExchange}.");
         }
     }
 }

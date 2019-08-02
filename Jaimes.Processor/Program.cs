@@ -27,7 +27,7 @@ namespace Jaimes.Processor
             GenericHandler handler1 = new GenericHandler(".\\fila_origem", "exchange_rabbit", "");
 
             for (; ; )
-            {
+            {   
                 Console.WriteLine("Lendo as mensagens");
 
                 handler1.ReadQueue(_channel);
